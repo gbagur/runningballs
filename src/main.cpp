@@ -5,48 +5,14 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>   
 #include <SFML/Audio.hpp>
+// Project
+#include "sound.h"
 
 
 #define MAX_FRAMERATE 500
 
 enum max_values { MAX_X = 1280, MAX_Y = 720 };
 float frametime = 0;
-
-
-class SoundEffect {
-public:
-	struct Sounds_t {
-		std::string name;
-		sf::SoundBuffer buffer;
-		sf::Sound sound;
-	};
-	std::vector<Sounds_t> sounds;
-	int error;
-	void add(std::string name) {
-		Sounds_t temp;
-		temp.name = name;
-		if (!temp.buffer.loadFromFile("c:/Temp/" + name + ".wav"))
-			std::cout << "EERRRRROR";
-		else
-			std::cout << "OK";
-		temp.sound.setBuffer(temp.buffer);
-		sounds.emplace_back(temp);
-	};
-	void play(std::string name) {
-		sounds[0].sound.play();
-		for (Sounds_t i : sounds) {
-			if (i.name == name)
-				i.sound.play();
-		}
-	}
-	void stop(std::string name) {
-		for (Sounds_t i : sounds) {
-			if (i.name == name)
-				i.sound.stop();
-		}
-	}
-
-};
 
 class DeadScene {
 public:
@@ -184,14 +150,22 @@ int main(void)
 	text1.setCharacterSize(30);
 
 	sf::RectangleShape background;
-	
+
 	SoundEffect sounds;
 	sounds.add("electricity");
-	
+
 	sf::Music music;
 	if (!music.openFromFile("c:/Temp/background.wav"))
 		return -1; // error
 	music.play();
+
+	sf::SoundBuffer buffer;
+	sf::Sound sound;
+	std::string temp = "c:/Temp/electricity.wav";
+	buffer.loadFromFile(temp);
+	sound.setBuffer(buffer);
+	//sound.play();
+
 
 	//sound_start.play();
 
@@ -264,14 +238,14 @@ restart:
 				window.draw(text1);
 			}
 		}
-		else 
+		else
 		{
 			player.gettingDamaged == false;
 			sounds.stop("electricity");
 			background.setFillColor(sf::Color::Red);
 			window.draw(background);
 			text1.setString("DEAD");
-			if (deadScene.run()==true)
+			if (deadScene.run() == true)
 				goto restart;
 		}
 
